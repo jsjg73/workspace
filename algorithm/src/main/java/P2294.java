@@ -9,15 +9,15 @@ public class P2294 extends InputHelper{
     static int[][] dist;
     static List<Node> nodes = new ArrayList<>();
     static int[][] dxy = {{1,0}, {-1,0}, {0,1}, {0,-1}};
-
+    static int n,h,d,k ;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(fis()));
         String s = br.readLine();
         StringTokenizer stringTokenizer = new StringTokenizer(s, " ");
-        int n = Integer.parseInt(stringTokenizer.nextToken());
-        int h = Integer.parseInt(stringTokenizer.nextToken());
-        int d = Integer.parseInt(stringTokenizer.nextToken());
-        int k = 0;
+        n = Integer.parseInt(stringTokenizer.nextToken());
+        h = Integer.parseInt(stringTokenizer.nextToken());
+        d = Integer.parseInt(stringTokenizer.nextToken());
+        k = 0;
 
         //map 초기화
         map = new char[n+2][n+2];
@@ -82,8 +82,54 @@ public class P2294 extends InputHelper{
             }
         }
 
-        //
+        int[] arr = new int[k+1];
+        int depth = 0;
+        dfs(arr, depth);
 
+        if(answer == Integer.MAX_VALUE) {
+            answer = -1;
+        }
+
+        System.out.println(answer);
+    }
+
+    static int answer = Integer.MAX_VALUE;
+    private static void dfs(int[] arr, int depth) {
+        // s 부터 arr[depth] 지나서 e까지 경로 가능 여부 , 불가능이면 -1
+        int limit = h;
+        int umb = 0;
+        int cost = 0;
+        for (int i = 0; i <= depth; i++) {
+            int from = nodes.get(arr[i]).idx;
+            int to = nodes.get(i+1).idx;
+            if(i == depth) { // 도착지점.
+                to = nodes.get(nodes.size()-1).idx;
+            }
+
+            int distance = dist[from][to];
+            cost += distance;
+
+            if(umb < distance) {
+                h -= distance - umb;
+            }
+
+            if(h < 0) {
+                cost = 0;
+                break;
+            }else {
+                umb = d;
+            }
+        }
+
+        if(cost != 0) {
+            answer = Math.min(cost, answer);
+        }
+
+
+        for (int i = depth + 1; i <= k; i++) {
+            arr[depth + 1] = nodes.get(i).idx;
+            dfs(arr, depth + 1);
+        }
     }
 
     private static void connect(int x, int y, int nx, int ny, int cost) {
